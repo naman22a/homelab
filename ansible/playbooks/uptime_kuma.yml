@@ -1,0 +1,7 @@
+---
+- name: Deploy Uptime Kuma
+  hosts: think-server
+  become: true
+
+  roles:
+      - uptime_kuma

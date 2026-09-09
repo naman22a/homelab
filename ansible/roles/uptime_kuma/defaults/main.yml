@@ -1,0 +1,10 @@
+#SPDX-License-Identifier: MIT-0
+# defaults file for roles/uptime_kuma
+---
+uptime_kuma_image: 'louislam/uptime-kuma:2'
+uptime_kuma_container_name: 'uptime-kuma'
+
+uptime_kuma_host_port: 3001
+uptime_kuma_container_port: 3001
+
+uptime_kuma_data_dir: '/opt/uptime-kuma/data'

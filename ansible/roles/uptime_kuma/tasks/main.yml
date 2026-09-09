@@ -1,0 +1,28 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for roles/uptime_kuma
+- name: Create Uptime Kuma data directory
+  ansible.builtin.file:
+      path: '{{ uptime_kuma_data_dir }}'
+      state: directory
+      owner: root
+      group: root
+      mode: '0755'
+
+- name: Pull Uptime Kuma image
+  community.docker.docker_image:
+      name: '{{ uptime_kuma_image }}'
+      source: pull
+
+- name: Run Uptime Kuma
+  community.docker.docker_container:
+      name: '{{ uptime_kuma_container_name }}'
+      image: '{{ uptime_kuma_image }}'
+      state: started
+      restart_policy: unless-stopped
+
+      ports:
+          - '{{ uptime_kuma_host_port }}:{{ uptime_kuma_container_port }}'
+
+      volumes:
+          - '{{ uptime_kuma_data_dir }}:/app/data'

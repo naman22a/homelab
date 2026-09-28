@@ -1,0 +1,6 @@
+- name: Configure Ollama server
+  hosts: think-server
+  become: true
+
+  roles:
+      - ollama

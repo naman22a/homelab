@@ -1,0 +1,12 @@
+---
+jellyfin_image: jellyfin/jellyfin:latest
+
+jellyfin_container_name: jellyfin
+
+jellyfin_compose_dir: /opt/jellyfin
+
+jellyfin_config_dir: /opt/jellyfin/config
+
+jellyfin_media_dir: /srv/nas/media
+
+jellyfin_http_port: 8096

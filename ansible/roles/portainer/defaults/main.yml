@@ -1,0 +1,14 @@
+---
+portainer_image: portainer/portainer-ce:lts
+
+portainer_container_name: portainer
+
+portainer_compose_dir: /opt/portainer
+
+portainer_https_port: 9443
+portainer_edge_agent_port: 8000
+
+portainer_enable_edge_agent: true
+
+portainer_volume_name: portainer_data
+portainer_network_name: portainer_network

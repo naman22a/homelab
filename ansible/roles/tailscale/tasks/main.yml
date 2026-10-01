@@ -1,0 +1,6 @@
+---
+- name: Configure Tailscale repository
+  ansible.builtin.import_tasks: repository.yml
+
+- name: Install Tailscale
+  ansible.builtin.import_tasks: install.yml

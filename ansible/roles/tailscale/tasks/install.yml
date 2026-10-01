@@ -1,0 +1,11 @@
+---
+- name: Install Tailscale
+  ansible.builtin.apt:
+      name: '{{ tailscale_package }}'
+      state: present
+
+- name: Enable Tailscale service
+  ansible.builtin.systemd:
+      name: tailscaled
+      enabled: '{{ tailscale_service_enabled }}'
+      state: "{{ 'started' if tailscale_service_started else 'stopped' }}"

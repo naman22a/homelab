@@ -1,0 +1,5 @@
+---
+tailscale_package: tailscale
+
+tailscale_service_enabled: true
+tailscale_service_started: true

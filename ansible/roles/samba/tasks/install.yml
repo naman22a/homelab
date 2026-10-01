@@ -1,0 +1,14 @@
+---
+- name: Install Samba
+  ansible.builtin.apt:
+      name:
+          - samba
+          - smbclient
+      state: present
+      update_cache: true
+
+- name: Enable Samba
+  ansible.builtin.systemd:
+      name: smbd
+      enabled: true
+      state: started

@@ -1,0 +1,17 @@
+---
+- name: Create NAS root
+  ansible.builtin.file:
+      path: '{{ nas_root }}'
+      state: directory
+      owner: '{{ samba_user }}'
+      group: '{{ samba_user }}'
+      mode: '0775'
+
+- name: Create NAS directories
+  ansible.builtin.file:
+      path: '{{ nas_root }}/{{ item }}'
+      state: directory
+      owner: '{{ samba_user }}'
+      group: '{{ samba_user }}'
+      mode: '0775'
+  loop: '{{ nas_directories }}'

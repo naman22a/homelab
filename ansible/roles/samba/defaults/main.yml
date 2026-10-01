@@ -1,0 +1,19 @@
+---
+samba_package: samba
+
+nas_root: /srv/nas
+
+nas_directories:
+    - media
+    - media/movies
+    - media/tv
+    - media/music
+    - photos
+    - documents
+
+samba_share_name: NAS
+samba_share_path: '{{ nas_root }}'
+
+samba_user: '{{ ansible_user }}'
+
+samba_workgroup: WORKGROUP

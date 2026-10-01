@@ -1,0 +1,21 @@
+---
+- name: Deploy Samba configuration
+  ansible.builtin.template:
+      src: smb.conf.j2
+      dest: /etc/samba/smb.conf
+      owner: root
+      group: root
+      mode: '0644'
+  notify: Restart Samba
+
+- name: Check Samba configuration
+  ansible.builtin.command:
+      cmd: testparm -s
+  changed_when: false
+
+- name: Create Samba user
+  ansible.builtin.shell:
+      cmd: |
+          (echo '{{ samba_password }}'; echo '{{ samba_password }}') | smbpasswd -a -s {{ samba_user }}
+  no_log: true
+  when: samba_password is defined

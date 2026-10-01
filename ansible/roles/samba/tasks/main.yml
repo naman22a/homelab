@@ -1,0 +1,9 @@
+---
+- name: Install Samba
+  ansible.builtin.import_tasks: install.yml
+
+- name: Create NAS directories
+  ansible.builtin.import_tasks: directories.yml
+
+- name: Configure Samba
+  ansible.builtin.import_tasks: configure.yml

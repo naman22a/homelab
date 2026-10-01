@@ -1,9 +1,10 @@
 ---
-- name: Configure home server
+- name: Configure Think Server
   hosts: think-server
   become: true
 
   roles:
       - docker
       - tailscale
+      - samba
       - portainer

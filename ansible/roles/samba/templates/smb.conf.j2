@@ -1,0 +1,19 @@
+[global]
+   workgroup = {{ samba_workgroup }}
+   server string = T480 NAS
+   security = user
+
+   map to guest = Bad User
+
+   server min protocol = SMB2
+
+[{{ samba_share_name }}]
+   path = {{ samba_share_path }}
+   browseable = yes
+   read only = no
+   writable = yes
+
+   valid users = {{ samba_user }}
+
+   create mask = 0664
+   directory mask = 0775

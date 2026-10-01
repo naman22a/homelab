@@ -1,0 +1,45 @@
+---
+- name: Install prerequisites
+  ansible.builtin.apt:
+      name:
+          - ca-certificates
+          - curl
+      state: present
+      update_cache: true
+
+- name: Create APT keyrings directory
+  ansible.builtin.file:
+      path: /etc/apt/keyrings
+      state: directory
+      owner: root
+      group: root
+      mode: '0755'
+
+- name: Download Docker GPG key
+  ansible.builtin.get_url:
+      url: https://download.docker.com/linux/ubuntu/gpg
+      dest: /etc/apt/keyrings/docker.asc
+      owner: root
+      group: root
+      mode: '0644'
+
+- name: Configure Docker APT repository
+  ansible.builtin.deb822_repository:
+      name: docker
+      types:
+          - deb
+      uris:
+          - https://download.docker.com/linux/ubuntu
+      suites:
+          - "{{ ansible_facts['distribution_release'] }}"
+      components:
+          - stable
+      architectures:
+          - amd64
+      signed_by: /etc/apt/keyrings/docker.asc
+      state: present
+      enabled: true
+
+- name: Update APT cache
+  ansible.builtin.apt:
+      update_cache: true

@@ -1,0 +1,22 @@
+---
+- name: Create Docker daemon configuration directory
+  ansible.builtin.file:
+      path: /etc/docker
+      state: directory
+      mode: '0755'
+
+- name: Configure Docker daemon
+  ansible.builtin.template:
+      src: daemon.json.j2
+      dest: /etc/docker/daemon.json
+      owner: root
+      group: root
+      mode: '0644'
+  notify: Restart Docker
+
+- name: Add users to docker group
+  ansible.builtin.user:
+      name: '{{ item }}'
+      groups: docker
+      append: true
+  loop: '{{ docker_users }}'

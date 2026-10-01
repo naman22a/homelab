@@ -1,0 +1,7 @@
+---
+- name: Configure home server
+  hosts: think-server
+  become: true
+
+  roles:
+      - docker

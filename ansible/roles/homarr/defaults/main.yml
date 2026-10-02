@@ -1,0 +1,7 @@
+---
+homarr_compose_dir: /opt/homarr
+homarr_appdata_dir: /opt/homarr/appdata
+
+homarr_image: ghcr.io/homarr-labs/homarr:latest
+
+homarr_port: 7575

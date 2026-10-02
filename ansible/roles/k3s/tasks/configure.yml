@@ -1,0 +1,36 @@
+---
+- name: Ensure k3s service is enabled and running
+  ansible.builtin.systemd:
+      name: k3s
+      enabled: true
+      state: started
+
+- name: Create .kube directory
+  ansible.builtin.file:
+      path: '/home/{{ ansible_user }}/.kube'
+      state: directory
+      owner: '{{ ansible_user }}'
+      group: '{{ ansible_user }}'
+      mode: '0700'
+
+- name: Copy k3s kubeconfig
+  ansible.builtin.copy:
+      src: /etc/rancher/k3s/k3s.yaml
+      dest: '/home/{{ ansible_user }}/.kube/config'
+      remote_src: true
+      owner: '{{ ansible_user }}'
+      group: '{{ ansible_user }}'
+      mode: '0600'
+
+- name: Verify k3s node
+  ansible.builtin.command:
+      cmd: kubectl get nodes
+  become: false
+  environment:
+      KUBECONFIG: '/home/{{ ansible_user }}/.kube/config'
+  register: k3s_nodes
+  changed_when: false
+
+- name: Show k3s nodes
+  ansible.builtin.debug:
+      var: k3s_nodes.stdout_lines

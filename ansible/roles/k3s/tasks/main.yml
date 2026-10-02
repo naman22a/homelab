@@ -1,0 +1,6 @@
+---
+- name: Install k3s
+  ansible.builtin.import_tasks: install.yml
+
+- name: Configure k3s
+  ansible.builtin.import_tasks: configure.yml

@@ -15,19 +15,22 @@
   ansible.builtin.command:
       cmd: /tmp/install-k3s.sh
   environment:
-      INSTALL_K3S_VERSION: '{{ k3s_version }}'
-  when:
-      - not k3s_binary.stat.exists
-      - k3s_version | length > 0
-
-- name: Install latest k3s
-  ansible.builtin.command:
-      cmd: /tmp/install-k3s.sh
+      INSTALL_K3S_EXEC: '--write-kubeconfig-mode=0640 --write-kubeconfig-group=k3s'
   when:
       - not k3s_binary.stat.exists
       - k3s_version | length == 0
 
-- name: Enable and start k3s
+- name: Install specific k3s version
+  ansible.builtin.command:
+      cmd: /tmp/install-k3s.sh
+  environment:
+      INSTALL_K3S_VERSION: '{{ k3s_version }}'
+      INSTALL_K3S_EXEC: '--write-kubeconfig-mode=0640 --write-kubeconfig-group=k3s'
+  when:
+      - not k3s_binary.stat.exists
+      - k3s_version | length > 0
+
+- name: Ensure k3s service is enabled and running
   ansible.builtin.systemd:
       name: '{{ k3s_service_name }}'
       enabled: true

@@ -1,3 +1,11 @@
-#SPDX-License-Identifier: MIT-0
 ---
-# handlers file for roles/k3s
+- name: Restart k3s
+  ansible.builtin.systemd:
+      name: k3s
+      state: restarted
+
+- name: Add user to k3s group
+  ansible.builtin.user:
+      name: '{{ k3s_user }}'
+      groups: k3s
+      append: true

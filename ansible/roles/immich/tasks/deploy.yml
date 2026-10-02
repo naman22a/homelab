@@ -1,0 +1,22 @@
+---
+- name: Download official Immich Compose file
+  ansible.builtin.get_url:
+      url: https://github.com/immich-app/immich/releases/latest/download/docker-compose.yml
+      dest: '{{ immich_compose_dir }}/docker-compose.yml'
+      owner: root
+      group: root
+      mode: '0644'
+
+- name: Deploy Immich environment file
+  ansible.builtin.template:
+      src: .env.j2
+      dest: '{{ immich_compose_dir }}/.env'
+      owner: root
+      group: root
+      mode: '0600'
+  no_log: true
+
+- name: Start Immich
+  community.docker.docker_compose_v2:
+      project_src: '{{ immich_compose_dir }}'
+      state: present

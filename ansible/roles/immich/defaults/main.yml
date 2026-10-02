@@ -1,0 +1,14 @@
+---
+immich_compose_dir: /opt/immich
+
+immich_upload_location: /srv/nas/photos/immich
+immich_db_location: /opt/immich/postgres
+
+immich_version: v3
+
+immich_timezone: Asia/Kolkata
+
+immich_db_username: postgres
+immich_db_database: immich
+
+immich_container_port: 2283

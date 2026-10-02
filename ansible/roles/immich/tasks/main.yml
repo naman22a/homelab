@@ -1,0 +1,6 @@
+---
+- name: Prepare Immich
+  ansible.builtin.import_tasks: install.yml
+
+- name: Deploy Immich
+  ansible.builtin.import_tasks: deploy.yml

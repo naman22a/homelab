@@ -5,10 +5,12 @@
 
   roles:
       - docker
+      - k3s
       - tailscale
+      - argocd
+
       - samba
-      - portainer
       - jellyfin
       - immich
+      - portainer
       - homarr
-      - k3s

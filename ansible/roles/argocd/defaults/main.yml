@@ -1,0 +1,9 @@
+---
+argocd_namespace: argocd
+
+argocd_manifest_url: >-
+    https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+
+argocd_server_deployment: argocd-server
+
+argocd_install_timeout: 300s

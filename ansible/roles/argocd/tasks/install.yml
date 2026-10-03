@@ -1,0 +1,31 @@
+---
+- name: Create Argo CD namespace
+  ansible.builtin.command:
+      cmd: kubectl create namespace {{ argocd_namespace }}
+  register: argocd_namespace_result
+  changed_when: argocd_namespace_result.rc == 0
+  failed_when:
+      - argocd_namespace_result.rc != 0
+      - "'AlreadyExists' not in argocd_namespace_result.stderr"
+
+- name: Install Argo CD
+  ansible.builtin.command:
+      cmd: >
+          kubectl apply
+          -n {{ argocd_namespace }}
+          --server-side
+          --force-conflicts
+          -f {{ argocd_manifest_url }}
+  register: argocd_install
+  changed_when: >
+      'created' in argocd_install.stdout or
+      'configured' in argocd_install.stdout
+
+- name: Wait for Argo CD server deployment
+  ansible.builtin.command:
+      cmd: >
+          kubectl rollout status
+          deployment/{{ argocd_server_deployment }}
+          -n {{ argocd_namespace }}
+          --timeout={{ argocd_install_timeout }}
+  changed_when: false

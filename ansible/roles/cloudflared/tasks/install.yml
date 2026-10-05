@@ -1,0 +1,29 @@
+---
+- name: Install cloudflared
+  ansible.builtin.apt:
+      name: '{{ cloudflared_package_name }}'
+      state: present
+      update_cache: true
+
+- name: Check cloudflared tunnel token
+  ansible.builtin.assert:
+      that:
+          - cloudflared_tunnel_token | length > 0
+      fail_msg: >
+          cloudflared_tunnel_token is not defined.
+          Add it to Ansible Vault before running this role.
+
+- name: Install cloudflared service
+  ansible.builtin.command:
+      cmd: 'cloudflared service install {{ cloudflared_tunnel_token }}'
+  args:
+      creates: /etc/systemd/system/cloudflared.service
+  no_log: true
+  notify: Restart cloudflared
+
+- name: Ensure cloudflared service is enabled and running
+  ansible.builtin.systemd:
+      name: cloudflared
+      enabled: true
+      state: started
+      daemon_reload: true

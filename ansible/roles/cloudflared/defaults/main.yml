@@ -1,0 +1,7 @@
+---
+cloudflared_package_name: cloudflared
+
+cloudflared_repo_key_url: 'https://pkg.cloudflare.com/cloudflare-main.gpg'
+cloudflared_repo_url: 'https://pkg.cloudflare.com/cloudflared'
+cloudflared_keyring_path: '/usr/share/keyrings/cloudflare-main.gpg'
+cloudflared_repo_file: '/etc/apt/sources.list.d/cloudflared.list'

@@ -1,0 +1,8 @@
+---
+- name: Install cloudflared repository
+  ansible.builtin.include_tasks:
+      file: repository.yml
+
+- name: Install cloudflared
+  ansible.builtin.include_tasks:
+      file: install.yml

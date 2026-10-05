@@ -1,0 +1,36 @@
+---
+- name: Ensure keyring directory exists
+  ansible.builtin.file:
+      path: /usr/share/keyrings
+      state: directory
+      owner: root
+      group: root
+      mode: '0755'
+
+- name: Download Cloudflare GPG key
+  ansible.builtin.get_url:
+      url: '{{ cloudflared_repo_key_url }}'
+      dest: '{{ cloudflared_keyring_path }}'
+      owner: root
+      group: root
+      mode: '0644'
+
+- name: Configure Cloudflare APT repository
+  ansible.builtin.deb822_repository:
+      name: cloudflared
+      types:
+          - deb
+      uris:
+          - '{{ cloudflared_repo_url }}'
+      suites:
+          - any
+      components:
+          - main
+      signed_by: '{{ cloudflared_keyring_path }}'
+      state: present
+  register: cloudflared_repository
+
+- name: Update APT cache
+  ansible.builtin.apt:
+      update_cache: true
+  when: cloudflared_repository.changed

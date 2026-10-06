@@ -1,0 +1,106 @@
+---
+- name: Install UFW
+  become: true
+  ansible.builtin.apt:
+      name: ufw
+      state: present
+      update_cache: true
+
+- name: Allow SSH
+  become: true
+  community.general.ufw:
+      rule: allow
+      port: '{{ ufw_ssh_port }}'
+      proto: tcp
+  when: ufw_allow_ssh
+
+- name: Allow inbound Tailscale traffic
+  become: true
+  community.general.ufw:
+      rule: allow
+      direction: in
+      interface: '{{ ufw_tailscale_interface }}'
+  when: ufw_allow_tailscale
+
+- name: Allow outbound Tailscale traffic
+  become: true
+  community.general.ufw:
+      rule: allow
+      direction: out
+      interface: '{{ ufw_tailscale_interface }}'
+  when: ufw_allow_tailscale
+
+- name: Allow HTTP
+  become: true
+  community.general.ufw:
+      rule: allow
+      port: '80'
+      proto: tcp
+  when: ufw_allow_http
+
+- name: Allow HTTPS
+  become: true
+  community.general.ufw:
+      rule: allow
+      port: '443'
+      proto: tcp
+  when: ufw_allow_https
+
+- name: Allow LAN access
+  become: true
+  community.general.ufw:
+      rule: allow
+      from_ip: '{{ ufw_lan_cidr }}'
+  when: ufw_allow_lan
+
+# k3s needs these ports for node/control-plane communication.
+# Since this is currently a single-node cluster, keep them restricted
+# to the LAN rather than exposing them publicly.
+- name: Allow k3s API from LAN
+  become: true
+  community.general.ufw:
+      rule: allow
+      from_ip: '{{ ufw_lan_cidr }}'
+      port: '6443'
+      proto: tcp
+  when: ufw_allow_k3s
+
+- name: Allow k3s supervisor from LAN
+  become: true
+  community.general.ufw:
+      rule: allow
+      from_ip: '{{ ufw_lan_cidr }}'
+      port: '9345'
+      proto: tcp
+  when: ufw_allow_k3s
+
+- name: Allow k3s VXLAN from LAN
+  become: true
+  community.general.ufw:
+      rule: allow
+      from_ip: '{{ ufw_lan_cidr }}'
+      port: '8472'
+      proto: udp
+  when: ufw_allow_k3s
+
+- name: Set default incoming policy
+  become: true
+  community.general.ufw:
+      direction: incoming
+      policy: '{{ ufw_default_incoming_policy }}'
+
+- name: Set default outgoing policy
+  become: true
+  community.general.ufw:
+      direction: outgoing
+      policy: '{{ ufw_default_outgoing_policy }}'
+
+- name: Enable UFW
+  become: true
+  community.general.ufw:
+      state: enabled
+
+- name: Enable UFW logging
+  become: true
+  community.general.ufw:
+      logging: 'low'

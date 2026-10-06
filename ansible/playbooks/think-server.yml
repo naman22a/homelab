@@ -7,8 +7,9 @@
       - docker
       - k3s
       - tailscale
-      - argocd
       - cloudflared
+      - ufw
+      - argocd
       - github_runner
 
       - samba

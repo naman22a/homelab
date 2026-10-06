@@ -1,0 +1,24 @@
+---
+ufw_default_incoming_policy: 'deny'
+ufw_default_outgoing_policy: 'allow'
+
+# SSH
+ufw_allow_ssh: true
+ufw_ssh_port: 22
+
+# Tailscale
+ufw_allow_tailscale: true
+ufw_tailscale_interface: 'tailscale0'
+
+# Kubernetes / k3s
+ufw_allow_k3s: true
+
+# Public HTTP/HTTPS.
+# Traefik receives these on the k3s node.
+ufw_allow_http: true
+ufw_allow_https: true
+
+# LAN network
+# Allows direct access to services from your home network.
+ufw_allow_lan: true
+ufw_lan_cidr: '192.168.1.0/24'

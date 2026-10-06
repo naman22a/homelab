@@ -7,3 +7,5 @@ argocd_manifest_url: >-
 argocd_server_deployment: argocd-server
 
 argocd_install_timeout: 300s
+
+argocd_hostname: argocd.namanarora.xyz

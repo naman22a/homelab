@@ -13,12 +13,12 @@ WorkingDirectory={{ github_runner_dir }}
 
 Environment="HOME=/home/{{ github_runner_user }}"
 
-ExecStart={{ github_runner_dir }}/run.sh
+ExecStart={{ github_runner_dir }}/runsvc.sh
 
 Restart=always
 RestartSec=5
 
-KillMode=process
+KillMode=control-group
 TimeoutStopSec=5min
 
 [Install]

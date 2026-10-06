@@ -9,6 +9,7 @@
       - tailscale
       - argocd
       - cloudflared
+      - github_runner
 
       - samba
       - jellyfin

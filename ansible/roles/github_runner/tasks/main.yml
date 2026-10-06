@@ -1,0 +1,97 @@
+---
+- name: Install GitHub Actions runner dependencies
+  become: true
+  ansible.builtin.apt:
+      name:
+          - curl
+          - tar
+          - gzip
+          - jq
+          - git
+          - ca-certificates
+          - libicu-dev
+          - libssl3
+          - libkrb5-3
+          - zlib1g
+      state: present
+      update_cache: true
+
+- name: Create GitHub runner directory
+  ansible.builtin.file:
+      path: '{{ github_runner_dir }}'
+      state: directory
+      owner: '{{ github_runner_user }}'
+      group: '{{ github_runner_user }}'
+      mode: '0755'
+
+- name: Check whether runner is already configured
+  ansible.builtin.stat:
+      path: '{{ github_runner_dir }}/.runner'
+  register: github_runner_config
+
+- name: Download GitHub Actions runner
+  ansible.builtin.get_url:
+      url: '{{ github_runner_url }}'
+      dest: '/tmp/actions-runner.tar.gz'
+      mode: '0644'
+  when: not github_runner_config.stat.exists
+
+- name: Extract GitHub Actions runner
+  ansible.builtin.unarchive:
+      src: '/tmp/actions-runner.tar.gz'
+      dest: '{{ github_runner_dir }}'
+      remote_src: true
+      owner: '{{ github_runner_user }}'
+      group: '{{ github_runner_user }}'
+  when: not github_runner_config.stat.exists
+
+- name: Install runner dependencies
+  become: true
+  ansible.builtin.command:
+      cmd: '{{ github_runner_dir }}/bin/installdependencies.sh'
+  when: not github_runner_config.stat.exists
+  changed_when: true
+
+- name: Configure GitHub Actions runner
+  ansible.builtin.command:
+      cmd: >-
+          ./config.sh
+          --unattended
+          --url "{{ github_runner_repo }}"
+          --token "{{ github_runner_token }}"
+          --name "{{ github_runner_name }}"
+          --labels "{{ github_runner_labels | join(',') }}"
+          --work "{{ github_runner_work_dir }}"
+          --replace
+  args:
+      chdir: '{{ github_runner_dir }}'
+  become: false
+  when: not github_runner_config.stat.exists
+  register: github_runner_config_result
+
+- name: Ensure runner directory ownership
+  become: true
+  ansible.builtin.file:
+      path: '{{ github_runner_dir }}'
+      state: directory
+      owner: '{{ github_runner_user }}'
+      group: '{{ github_runner_user }}'
+      recurse: true
+
+- name: Install GitHub Actions runner systemd service
+  become: true
+  ansible.builtin.template:
+      src: github-runner.service.j2
+      dest: '/etc/systemd/system/github-actions-runner.service'
+      owner: root
+      group: root
+      mode: '0644'
+  notify: Restart GitHub Actions runner
+
+- name: Enable and start GitHub Actions runner
+  become: true
+  ansible.builtin.systemd:
+      name: github-actions-runner
+      enabled: true
+      state: started
+      daemon_reload: true

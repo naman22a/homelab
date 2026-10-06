@@ -1,0 +1,7 @@
+---
+- name: Restart GitHub Actions runner
+  become: true
+  ansible.builtin.systemd:
+      name: github-actions-runner
+      state: restarted
+      daemon_reload: true

@@ -6,6 +6,7 @@
   roles:
       - docker
       - k3s
+      - helm
       - tailscale
       - cloudflared
       - ufw

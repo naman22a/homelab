@@ -14,7 +14,6 @@ Currently, this repository manages one server: `think-server`, a ThinkPad T480 r
                             ▼
                     ┌───────────────┐
                     │  think-server │
-                    │  192.168.1.10 │
                     └───────┬───────┘
                             │
                      ┌──────▼──────┐
@@ -139,7 +138,8 @@ roles/<role>/
 Run the complete server configuration with:
 
 ```bash
-ansible-playbook playbooks/think-server.yml --ask-vault-pass
+cd ansible
+ansible-playbook playbooks/think-server.yml --vault-password-file .vault_pass
 ```
 
 Secrets that need to be available to Ansible are stored in:

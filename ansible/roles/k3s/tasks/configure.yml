@@ -49,3 +49,10 @@
 - name: Show k3s nodes
   ansible.builtin.debug:
       var: k3s_nodes.stdout_lines
+
+- name: Configure Traefik HTTP to HTTPS redirect
+  become: true
+  ansible.builtin.template:
+      src: traefik-config.yaml.j2
+      dest: /var/lib/rancher/k3s/server/manifests/traefik-config.yaml
+      mode: '0644'

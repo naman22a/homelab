@@ -42,53 +42,33 @@ Private administration is handled through Tailscale SSH.
 
 ![Thinkpad T480](./assets/laptop.jpeg)
 
-## Services
+## 🚕 Services
 
-| Service                   | Purpose                        | Access           |         Port |
-| ------------------------- | ------------------------------ | ---------------- | -----------: |
-| **Homarr**                | Homelab dashboard              | LAN / Cloudflare |       `7575` |
-| **Portainer**             | Docker management              | LAN              |       `9443` |
-| **Jellyfin**              | Media server                   | LAN / Cloudflare |       `8096` |
-| **Immich**                | Photo management               | LAN / Cloudflare |       `2283` |
-| **Argo CD**               | GitOps / Kubernetes management | Cloudflare       | `80` / `443` |
-| **Online Judge**          | Online coding judge            | Cloudflare       | `80` / `443` |
-| **Samba**                 | Network file sharing           | LAN              |        `445` |
-| **Tailscale**             | Private remote access          | Tailscale        |            — |
-| **Cloudflared**           | Cloudflare Tunnel              | Outbound         |            — |
-| **k3s**                   | Kubernetes cluster             | LAN              |       `6443` |
-| **Traefik**               | Kubernetes ingress             | LAN / Cloudflare | `80` / `443` |
-| **GitHub Actions Runner** | CI/CD runner                   | Outbound         |            — |
+| Service                   | Purpose               | Access           |
+| ------------------------- | --------------------- | ---------------- |
+| **Homarr**                | Homelab dashboard     | LAN / Cloudflare |
+| **Portainer**             | Docker management     | LAN              |
+| **Jellyfin**              | Media server          | LAN / Cloudflare |
+| **Immich**                | Photo management      | LAN / Cloudflare |
+| **Argo CD**               | GitOps / Kubernetes   | Cloudflare       |
+| **Online Judge**          | Kubernetes workload   | Cloudflare       |
+| **Samba**                 | Network file sharing  | LAN              |
+| **Tailscale**             | Private remote access | Tailscale        |
+| **Cloudflared**           | Public service tunnel | Outbound         |
+| **k3s**                   | Kubernetes            | LAN              |
+| **Traefik**               | Kubernetes ingress    | LAN / Cloudflare |
+| **GitHub Actions Runner** | CI/CD                 | Outbound         |
 
-### Online Judge — Kubernetes Services
+## 🌐 Server
 
-| Service             | Kubernetes Port | Type      |
-| ------------------- | --------------: | --------- |
-| API Gateway         |          `5000` | NodePort  |
-| Auth Service        |          `5002` | ClusterIP |
-| Users Service       |          `5001` | ClusterIP |
-| Problems Service    |          `5003` | ClusterIP |
-| Tags Service        |          `5004` | ClusterIP |
-| Companies Service   |          `5005` | ClusterIP |
-| Submissions Service |          `5006` | ClusterIP |
-| Execution Service   |  `5007`, `9007` | ClusterIP |
-| PostgreSQL          |          `5432` | ClusterIP |
-| Redis               |          `6379` | ClusterIP |
-| Frontend            |          `3000` | NodePort  |
-
-## Server
-
-| Property           | Value               |
-| ------------------ | ------------------- |
-| Hostname           | `think-server`      |
-| Hardware           | ThinkPad T480       |
-| OS                 | Ubuntu Server 26.04 |
-| Kubernetes         | k3s                 |
-| Kubernetes version | `v1.36.5+k3s1`      |
-| Configuration      | Ansible             |
+- **Host:** ThinkPad T480 (`think-server`)
+- **OS:** Ubuntu Server 26.04
+- **Kubernetes:** k3s `v1.36.5+k3s1`
+- **Configuration:** Ansible
 
 The server is intended to be managed through Ansible rather than manually configured wherever practical.
 
-## Repository Structure
+## 🚧 Repository Structure
 
 ```text
 .
@@ -118,88 +98,27 @@ The server is intended to be managed through Ansible rather than manually config
 └── README.md
 ```
 
-Each service is separated into an Ansible role where practical.
+## 🍁 Ansible
 
-Typical role structure:
-
-```text
-roles/<role>/
-├── defaults/
-│   └── main.yml
-├── tasks/
-│   └── main.yml
-├── handlers/
-│   └── main.yml
-└── templates/
-```
-
-## Ansible
-
-Run the complete server configuration with:
+The server is configured through modular Ansible roles.
 
 ```bash
 cd ansible
 ansible-playbook playbooks/think-server.yml --vault-password-file .vault_pass
 ```
 
-Secrets that need to be available to Ansible are stored in:
-
-`group_vars/vault.yml`
+Secrets that need to be available to Ansible are stored in: `group_vars/vault.yml`
 
 The file is encrypted using Ansible Vault.
 
-## UFW
+## 🌐 Remote Access
 
-The server uses UFW with a default-deny incoming policy.
+- **Tailscale** — private SSH access
+- **Cloudflare Tunnel** — public exposure without directly exposing the server
 
-Allowed traffic includes:
+Public traffic is routed through Cloudflare → Traefik → Kubernetes services.
 
-- SSH (22/tcp)
-- Tailscale interface
-- HTTP (80/tcp)
-- HTTPS (443/tcp)
-- LAN traffic from 192.168.1.0/24
-- k3s API (6443/tcp) from LAN
-- k3s supervisor (9345/tcp) from LAN
-- k3s VXLAN (8472/udp) from LAN
-
-The k3s-specific ports are intentionally restricted to the LAN rather than exposed publicly.
-
-## Remote Access
-
-### Tailscale
-
-Tailscale provides private remote access to the server.
-
-SSH can be performed through the Tailscale hostname:
-
-```bash
-ssh naman@think-server
-```
-
-Tailscale is also allowed through UFW using the tailscale0 interface.
-
-### Cloudflare Tunnel
-
-Cloudflare Tunnel is used for public-facing services.
-
-The cloudflared service runs on think-server:
-
-```bash
-/usr/bin/cloudflared --no-autoupdate tunnel run --token-file /etc/cloudflared/token
-```
-
-Public services are routed through the local Traefik ingress.
-
-Current hostnames discussed in this setup:
-
-- judge.namanarora.xyz
-- api-judge.namanarora.xyz
-- argocd.namanarora.xyz
-
-The Cloudflare Tunnel avoids directly exposing the server's public IP.
-
-## Kubernetes
+## 🟣 Kubernetes
 
 ### k3s
 
@@ -215,12 +134,6 @@ think-server
 
 The node is configured as the control-plane node.
 
-Kubernetes access is available to the naman user without requiring sudo:
-
-```bash
-kubectl get nodes
-```
-
 ### Traefik
 
 Traefik is the ingress controller provided by the k3s installation.
@@ -232,7 +145,7 @@ It receives traffic on:
 
 The Online Judge and Argo CD services are routed through Traefik.
 
-## Monitoring
+## 📊 Monitoring
 
 The cluster is monitored using Prometheus and Grafana.
 
@@ -244,7 +157,7 @@ Kubernetes pod logs are collected using Grafana Alloy and stored in Loki.
 
 ![Loki Logs](./assets/loki-logs.png)
 
-## Online Judge
+## 👨‍⚖️ Online Judge
 
 The main Kubernetes workload is my Online Judge Platform.
 
@@ -254,154 +167,33 @@ Repository: https://github.com/naman22a/online-judge-platform
 
 It runs in the: `oj` namespace.
 
-### Services
+The platform consists of multiple NestJS backend services, PostgreSQL, Redis and a React frontend.
 
-The deployment contains the following backend services:
+The execution service creates Kubernetes Jobs for submitted code, with resource limits and timeouts.
 
-- api-gateway
-- auth-service
-- users-service
-- problems-service
-- tags-service
-- companies-service
-- submissions-service
-- execution-service
+## 🐋 Docker
 
-along with:
+Docker is managed through Ansible and is used for non-Kubernetes services such as Portainer and other homelab workloads.
 
-- PostgreSQL
-- Redis
-- React client
+## 💿 Storage & Media
 
-The frontend is available at: https://judge.namanarora.xyz
+The homelab also hosts Samba, Jellyfin and Immich for NAS, media and photo management.
 
-The API is exposed at: https://api-judge.namanarora.xyz
+## 🐙 Argo CD
 
-### Execution
+Argo CD manages Kubernetes deployments in the `argocd` namespace.
 
-The execution service creates Kubernetes Jobs for submitted code.
+The server is exposed through Traefik, with TLS terminated at the ingress.
 
-Runner images currently include:
+## 🧲 GitHub Actions
 
-- gcc:15
-- python:3.9
-- node:18
-- eclipse-temurin:17-jdk
+A self-hosted GitHub Actions runner runs on `think-server` and is used for CI/CD tasks related to the Online Judge.
 
-Execution Jobs have resource limits and timeouts and run independently from the execution service.
+The runner has access to Docker and kubectl and is managed as a system service.
 
-## Docker
+Because it has access to the homelab infrastructure, untrusted workflows should not be executed on it.
 
-Docker is installed on think-server and is managed through Ansible.
-
-Docker is used for the server-side container workloads and management tooling.
-
-Portainer is also installed for Docker management.
-
-## Portainer
-
-Portainer CE is deployed using Docker Compose.
-
-Relevant ports:
-
-- 9443
-- 8000
-
-The Docker socket is made available to Portainer for Docker management.
-
-## Storage / Media Services
-
-The server also contains Ansible roles for:
-
-- Samba
-- Jellyfin
-- Immich
-
-These provide the homelab's NAS/media/photo functionality.
-
-The Samba configuration uses credentials stored through Ansible Vault.
-
-## Homarr
-
-Homarr is included as a homelab dashboard.
-
-It is intended to provide a central dashboard for the services running on the server.
-
-## Argo CD
-
-Argo CD is already installed inside the k3s cluster.
-
-Namespace: `argocd`
-
-Current components include:
-
-- argocd-server
-- argocd-repo-server
-- argocd-application-controller
-- argocd-applicationset-controller
-- argocd-dex-server
-- argocd-redis
-- argocd-notifications-controller
-
-The Argo CD server is exposed internally through:
-
-- argocd-server:80
-- argocd-server:443
-
-For the external setup, TLS termination is handled by Traefik.
-
-Argo CD is configured with: `server.insecure=true`
-
-so that Traefik can terminate TLS.
-
-The planned external hostname is: https://argocd.namanarora.xyz
-
-Traffic flow:
-
-```text
-argocd.namanarora.xyz
-        │
-        ▼
-Cloudflare Tunnel
-        │
-        ▼
-Traefik
-        │
-        ▼
-argocd-server:80
-```
-
-The Argo CD Traefik configuration is managed through the Ansible argocd role.
-
-## GitHub Actions Runner
-
-A self-hosted GitHub Actions runner runs directly on think-server.
-
-Repository: `naman22a/online-judge-platform`
-
-Runner: `think-server`
-
-Labels:
-
-- self-hosted
-- linux
-- x64
-- think-server
-
-The runner allows GitHub Actions to execute deployment tasks directly against the k3s cluster.
-
-The runner is managed as a system service using GitHub's svc.sh.
-
-The runner has access to:
-
-- kubectl
-- docker
-
-as the naman user.
-
-Because the runner has access to the homelab infrastructure, untrusted workflows should not be executed on it.
-
-## GitOps
+## 🐙 GitOps
 
 Argo CD manages the Kubernetes deployment state.
 
@@ -440,34 +232,23 @@ GitHub Actions
 
 The goal is for Argo CD to become the deployment authority for Kubernetes workloads, rather than having GitHub Actions directly modify Kubernetes deployments.
 
-## Secrets
+## 🫆 Secrets
 
-Sensitive values are kept out of normal Git configuration where possible.
+Sensitive configuration is managed using Ansible Vault and is not committed as plaintext.
 
-Ansible secrets are stored in: `group_vars/vault.yml`
+Kubernetes credentials should likewise not be stored directly in Git.
 
-and encrypted using: `ansible-vault`
-
-The Ansible Vault password itself is not stored in this repository.
-
-Kubernetes secrets should likewise not be committed as plaintext credentials.
-
-## Design Goals
+## 🛟 Design Goals
 
 This homelab is primarily a learning and portfolio project focused on:
 
 - Linux administration
-- Ansible
+- Ansible / Infrastructure as Code
 - Docker
-- Kubernetes
-- k3s
-- Traefik
+- Kubernetes / k3s
 - GitHub Actions
-- GitOps
-- Argo CD
-- Cloudflare Tunnel
-- Tailscale
-- Infrastructure as Code
+- GitOps / Argo CD
+- Networking
 - Self-hosted services
 
-The goal is not to build a production-grade multi-node cluster. The infrastructure is intentionally centered around a single ThinkPad T480, making it inexpensive to experiment with real infrastructure concepts while keeping the configuration reproducible through code.
+The goal is not to build a production-grade multi-node cluster, but to experiment with real infrastructure concepts on inexpensive hardware while keeping everything reproducible through code.

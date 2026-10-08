@@ -232,9 +232,23 @@ It receives traffic on:
 
 The Online Judge and Argo CD services are routed through Traefik.
 
+## Monitoring
+
+The cluster is monitored using Prometheus and Grafana.
+
+![Grafana Kubernetes Dashboard](./assets/grafana.png)
+
+### Centralized Logging
+
+Kubernetes pod logs are collected using Grafana Alloy and stored in Loki.
+
+![Loki Logs](./assets/loki-logs.png)
+
 ## Online Judge
 
 The main Kubernetes workload is my Online Judge Platform.
+
+![Online Judge Platform](./assets/online-judge.png)
 
 Repository: https://github.com/naman22a/online-judge-platform
 
@@ -388,6 +402,10 @@ as the naman user.
 Because the runner has access to the homelab infrastructure, untrusted workflows should not be executed on it.
 
 ## GitOps
+
+Argo CD manages the Kubernetes deployment state.
+
+![Argo CD](./assets/argocd.png)
 
 The intended deployment architecture is:
 

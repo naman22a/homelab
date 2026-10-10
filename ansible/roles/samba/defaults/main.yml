@@ -10,6 +10,7 @@ nas_directories:
     - media/music
     - photos
     - documents
+    - backups
 
 samba_share_name: NAS
 samba_share_path: '{{ nas_root }}'
